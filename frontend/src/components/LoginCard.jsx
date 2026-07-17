@@ -160,13 +160,19 @@ export default function LoginCard() {
             <div className="flex-1 h-px bg-gray-300" />
           </div>
 
-          {/* SSO Button */}
-          <button
-            type="button"
-            className="w-full border-2 border-red-600 text-red-600 font-bold py-2.5 px-4 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-          >
-            🛡️ LOGIN WITH SSO
-          </button>
+           <div className="text-center">
+  <span className="text-sm text-gray-600">
+    New to the system?{" "}
+  </span>
+
+  <button
+    type="button"
+    onClick={() => navigate("/register")}
+    className="text-red-600 font-bold hover:text-red-700 transition"
+  >
+    Create a New Account
+  </button>
+</div>
 
         </form>
 
