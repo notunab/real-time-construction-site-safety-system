@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/ongc_logo.png";
 
@@ -8,21 +9,28 @@ export default function LoginCard() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+  e.preventDefault();
 
-    setTimeout(() => {
-      if (email && password) {
-        console.log("Login:", { email, password, rememberMe });
-      } else {
-        setError("Please fill in all fields");
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
+  setError("");
+
+  if (!email || !password) {
+    setError("Please fill in all fields");
+    return;
+  }
+
+  setIsLoading(true);
+
+  // Fake login delay
+  setTimeout(() => {
+    setIsLoading(false);
+
+    // Go to dashboard
+    navigate("/dashboard");
+  }, 1000);
+};
 
   return (
     <div className="w-1/2 h-screen bg-white flex items-center justify-center px-8 py-4">
