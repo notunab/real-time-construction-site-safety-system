@@ -1,3 +1,4 @@
+import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "../assets/ongc_logo.png";
@@ -11,7 +12,7 @@ export default function LoginCard() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
   e.preventDefault();
 
   setError("");
@@ -23,13 +24,35 @@ export default function LoginCard() {
 
   setIsLoading(true);
 
-  // Fake login delay
-  setTimeout(() => {
-    setIsLoading(false);
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    // Go to dashboard
-    navigate("/dashboard");
-  }, 1000);
+  if (error) {
+    setIsLoading(false);
+    setError(error.message);
+    return;
+  }
+
+  // Get user's profile
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", data.user.id)
+    .single();
+
+  if (profileError) {
+    setIsLoading(false);
+    setError(profileError.message);
+    return;
+  }
+
+  console.log("Logged in user:", profile);
+
+  setIsLoading(false);
+
+  navigate("/dashboard");
 };
 
   return (

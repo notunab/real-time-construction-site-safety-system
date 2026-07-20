@@ -1,3 +1,4 @@
+import { supabase } from "../lib/supabase";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/ongc_logo.png";
@@ -25,37 +26,70 @@ export default function Register() {
     });
   };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    setError("");
+  const handleRegister = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (
-      !formData.fullName ||
-      !formData.employeeId ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.role ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      setError("Please fill in all fields.");
-      return;
-    }
+  if (
+    !formData.fullName ||
+    !formData.employeeId ||
+    !formData.email ||
+    !formData.phone ||
+    !formData.role ||
+    !formData.password ||
+    !formData.confirmPassword
+  ) {
+    setError("Please fill in all fields.");
+    return;
+  }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      alert("Registration Successful!");
-      navigate("/");
-    }, 1200);
+  const { data, error } = await supabase.auth.signUp({
+  email: formData.email,
+  password: formData.password,
+});
+
+if (error) {
+  setLoading(false);
+  setError(error.message);
+  return;
+}
+
+const user = data.user;
+
+if (user) {
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .insert([
+      {
+        id: user.id,
+        full_name: formData.fullName,
+        employee_id: formData.employeeId,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+      },
+    ]);
+
+  if (profileError) {
+    setLoading(false);
+    setError(profileError.message);
+    return;
+  }
+}
+
+setLoading(false);
+
+alert("Registration Successful!");
+
+navigate("/");
   };
-
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl p-10">
